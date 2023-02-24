@@ -4,16 +4,16 @@ import { Location } from './location';
 import { Hotel } from './hotel';
 
 
-export enum HotelRoomStatus {
-    HC = "Location Created",
-    HU = "Location Updated",
-    HD = "Hotel Room Deleted",
+export enum RoomRowStatus {
+    RC = "Room Created",
+    RU = "Room Updated",
+    RD = "Room Deleted",
 }
 
 export enum RoomType {
-    E="Economic",
+    E = "Economic",
     D = "Deluxe",
-    S="Standard"
+    S = "Standard"
 }
 
 
@@ -22,10 +22,7 @@ export class Room {
     @PrimaryGeneratedColumn("uuid")
     id?: string
 
-   //@ManyToOne
-
-   
-    @Column()
+    @Column({ type: "float" })
     price?: number
 
     @Column()
@@ -37,12 +34,13 @@ export class Room {
     @Column()
     roomNo: number
 
-    @Column({
-        type: "enum",
-        enum: RoomType,
-        default: RoomType.E,
-    })
-    roomtype:RoomType
+    // @Column({
+    //     type: "enum",
+    //     enum: RoomType,
+    //     default: RoomType.E,
+    // })
+    @Column()
+    roomtype: string
 
 
     @Column()
@@ -60,18 +58,21 @@ export class Room {
     @Column()
     swimmingPool?: boolean
 
+    @Column()
+    gym?: boolean
+
     @CreateDateColumn()
     createdDate?: Date
 
 
     @Column({
         type: "enum",
-        enum: HotelRoomStatus,
-        default: HotelRoomStatus.HC,
+        enum: RoomRowStatus,
+        default: RoomRowStatus.RC,
     })
-    status:HotelRoomStatus
+    status: RoomRowStatus
 
 
-    @ManyToOne(()=>Hotel, (hotel)=>hotel.rooms)
-    hotel:Hotel
+    @ManyToOne(() => Hotel, (hotel) => hotel.rooms)
+    hotel: Hotel
 }

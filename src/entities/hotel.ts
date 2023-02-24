@@ -4,7 +4,7 @@ import { Room } from './room';
 import { Location } from './location';
 
 
-export enum HotelStatus {
+export enum HotelRowStatus {
     HC = "Hotel Created",
     HU = "Hotel Updated",
     HD = "Hotel Deleted",
@@ -27,10 +27,10 @@ export class Hotel {
 
     @Column({
         type: "enum",
-        enum: HotelStatus,
-        default: HotelStatus.HC,
+        enum: HotelRowStatus,
+        default: HotelRowStatus.HC,
     })
-    status:HotelStatus
+    status:HotelRowStatus
 
     @ManyToOne(()=>Seller, (seller) => seller.hotels)
     seller: Seller

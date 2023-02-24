@@ -1,0 +1,32 @@
+[
+    { 
+	"price": 100,
+    "image": "https://imgs.search.brave.com/o5SsETgx3LI9jJhgk9Y9anqHdGgvW7vPVw7iuoOxjHY/rs:fit:1008:768:1/g:ce/aHR0cHM6Ly9waXgx/MC5hZ29kYS5uZXQv/aG90ZWxJbWFnZXMv/MTE4LzExODQ1NzYv/MTE4NDU3Nl8xNjEw/MDcxMTE3MDA0NzUx/OTI0MC5qcGc_cz0x/MDI0eDc2OA",
+    "roomNo": 1,
+    "roomType": "Economic",
+    "sceneryFacing": true,
+    "rental": false,
+    "ticketing": true,
+    "balcony": true,
+    "swimmingPool": true,
+    "noOfBed": 5,
+    "gym": true,
+    "hotelId": "158a2921-afaf-4ca9-8886-3efbc0fd091e" 
+},
+{ 
+	"price": 100,
+    "image": "https://imgs.search.brave.com/o5SsETgx3LI9jJhgk9Y9anqHdGgvW7vPVw7iuoOxjHY/rs:fit:1008:768:1/g:ce/aHR0cHM6Ly9waXgx/MC5hZ29kYS5uZXQv/aG90ZWxJbWFnZXMv/MTE4LzExODQ1NzYv/MTE4NDU3Nl8xNjEw/MDcxMTE3MDA0NzUx/OTI0MC5qcGc_cz0x/MDI0eDc2OA",
+    "roomNo": 1,
+    "roomType": "Economic",
+    "sceneryFacing": true,
+    "rental": false,
+    "ticketing": true,
+    "balcony": true,
+    "swimmingPool": true,
+    "noOfBed": 5,
+    "gym": true,
+    "hotelId": "158a2921-afaf-4ca9-8886-3efbc0fd091e" 
+}
+
+
+]

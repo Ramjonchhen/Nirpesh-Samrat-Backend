@@ -1,42 +1,21 @@
 import { Router } from "express";
+
 import { AppDataSource } from "../../data-source";
+import { Hotel, HotelRowStatus } from "../../entities/hotel";
 import { SuccessMessage } from "../../response-output/sucess-messsage";
-import { Hotel } from "../../entities/hotel";
+import { Seller } from "../../entities/seller";
+import { Not } from "typeorm";
+import { getLocationById } from "../../controllers/users/locaton"
+import { RoomRowStatus } from "../../entities/room";
 
+const hotelRepo = AppDataSource.getRepository(Hotel);
+const sellerRepo = AppDataSource.getRepository(Seller);
 
-const hotelModel = AppDataSource.getRepository(Hotel)
+export const hotelController = Router();
 
-
-export const hotelRoomController = Router();
-
-hotelRoomController.get("/", async (req, res) => {
+export async function getHotelById(id: string) {
   try {
-    const hotelRoomMap = await hotelModel.find();
-    const data = await hotelModel.save(hotelRoomMap);
-    res.send(data);
-  }
-  catch (e) {
-    return res.status(405).send(e);
-  }
-})
-
-hotelRoomController.post("/", async (req, res) => {
-  try {
-    const entities = req.body;
-    console.log(entities);
-    const newHotel = hotelModel.create(entities);
-    await hotelModel.save(newHotel);
-    const succeessRes = new SuccessMessage("Hotel added succesfully");
-    res.send(succeessRes);
-  }
-  catch (e) {
-    return res.status(405).send(e);
-  }
-})
-
-async function getHotelById(id: string) {
-  try {
-    const hotel = await hotelModel.find({
+    const hotel = await hotelRepo.findOne({
       where: {
         id,
       }
@@ -52,14 +31,137 @@ async function getHotelById(id: string) {
   }
 }
 
-hotelRoomController.delete("/", async (req, res) => {
+hotelController.get("/", async (req, res) => {
   try {
-    const hotel = await getHotelById(req.body.id);
-    hotelModel.remove(hotel);
-    const succeessRes = new SuccessMessage("Hotel removed succesfully");
-    res.send(succeessRes);
-  } catch (e) {
-    return res.status(405).send(e);
+    return res.send(await hotelRepo.find({
+      where: {
+        status: Not(HotelRowStatus.HD),
+      }, select: {
+        name: true,
+        id: true,
+        address: true,
+      }, relations: {
+        location: true,
+        seller: true,
+      }
+    }));
+  } catch (error) {
+    return res.status(405).send(error);
   }
+})
 
+hotelController.get("/rooms/:id", async (req, res) => {
+  console.log("hotel rooms is called");
+  try {
+    const hotelId = req.params?.id as string;
+    const Hotel = await getHotelById(hotelId!);
+
+    const hotelWithRooms = await hotelRepo.createQueryBuilder('hotel')
+      .leftJoin("hotel.rooms", "room")
+      .leftJoin("hotel.location","location")
+      .select(
+        [
+          'hotel.id',
+          'hotel.name',
+          'hotel.address',
+          'location.name',
+          'room.id',
+          'room.price',
+          'room.images',
+          'room.roomNo',
+          'room.roomType',
+          'room.sceneryFacing',
+          'room.rental',
+          'room.ticketing',
+          'room.balcony',
+          'room.swimmingPool',
+          'room.gym',
+        ]
+      )
+      .where("hotel.id = :id", {
+        id: hotelId,
+      })
+      .andWhere("hotel.status = :hotelRowStatus1", {
+        hotelRowStatus1: HotelRowStatus.HC,
+      })
+      .orWhere("hotel.status = :hotelRowStatus2", {
+        hotelRowStatus2: HotelRowStatus.HU,
+      })
+      .where("room.status = :roomRowStatus1", {
+        roomRowStatus1: RoomRowStatus.RC,
+      })
+      .orWhere("room.status = :roomRowStatus2", {
+        roomRowStatus2: RoomRowStatus.RU,
+      })
+      .getMany();
+    console.log("hotel with room is: ", hotelWithRooms);
+
+    return res.send(
+      hotelWithRooms
+    );
+  } catch (error) {
+    return res.status(405).send(error);
+  }
+})
+
+hotelController.post("/", async (req, res) => {
+  try {
+    const { name, address, locationId } = req.body;
+    const newHotel = new Hotel();
+    newHotel.name = name;
+    newHotel.address = address;
+    newHotel.seller = await sellerRepo.findOne({
+      where: {
+        id: '8905c986-a71b-469b-889f-4e4406b8d02a'
+      }
+    });
+    const location = await getLocationById(locationId);
+    console.log("location in hotel controller is: ", location);
+    newHotel.location = location;
+    console.log("new Hotel is: ", newHotel);
+    hotelRepo.save(newHotel);
+    const succeessRes = new SuccessMessage("Hotel added succesfully");
+    res.send(succeessRes);
+  } catch (error) {
+    return res.status(405).send(error);
+  }
+})
+
+hotelController.delete("/:id", async (req, res) => {
+  try {
+    const id = req.params?.id as string;
+    const Hotel = await getHotelById(id!);
+    hotelRepo.update({
+      id
+    }, {
+      status: HotelRowStatus.HD,
+    })
+    const succeessRes = new SuccessMessage("Hotel Removed succesfully");
+    res.send(succeessRes);
+  } catch (error) {
+    return res.status(405).send(error);
+  }
+})
+
+hotelController.patch("/:id", async (req, res) => {
+  try {
+    const id = req.params?.id as string;
+    const name = req.body.name as string;
+    const address = req.body.address as string;
+
+    const Hotel = await getHotelById(id);
+    if (name) Hotel.name = name;
+    if (address) Hotel.address = address;
+    // hotelRepo.update({
+    //   id
+    // }, {
+    //   name,
+    //   status: HotelRowStatus.HU,
+    // })
+    hotelRepo.save(Hotel);
+    const succeessRes = new SuccessMessage("Hotel Updated succesfully");
+    res.send(succeessRes);
+  } catch (error) {
+    return res.status(405).send(error);
+  }
 })

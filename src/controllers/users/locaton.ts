@@ -11,7 +11,7 @@ const sellerRepo = AppDataSource.getRepository(Seller);
 
 export const locationController = Router();
 
-async function getLocationById(id: string) {
+export async function getLocationById(id: string) {
     try {
         const location = await locationRepo.findOne({
             where: {
