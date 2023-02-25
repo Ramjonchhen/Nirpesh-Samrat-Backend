@@ -51,7 +51,6 @@ hotelController.get("/", async (req, res) => {
 })
 
 hotelController.get("/rooms/:id", async (req, res) => {
-  console.log("hotel rooms is called");
   try {
     const hotelId = req.params?.id as string;
     const Hotel = await getHotelById(hotelId!);
@@ -69,7 +68,7 @@ hotelController.get("/rooms/:id", async (req, res) => {
           'room.price',
           'room.images',
           'room.roomNo',
-          'room.roomType',
+          'room.roomtype',
           'room.sceneryFacing',
           'room.rental',
           'room.ticketing',
@@ -87,14 +86,13 @@ hotelController.get("/rooms/:id", async (req, res) => {
       .orWhere("hotel.status = :hotelRowStatus2", {
         hotelRowStatus2: HotelRowStatus.HU,
       })
-      .where("room.status = :roomRowStatus1", {
+      .andWhere("room.status = :roomRowStatus1", {
         roomRowStatus1: RoomRowStatus.RC,
       })
       .orWhere("room.status = :roomRowStatus2", {
         roomRowStatus2: RoomRowStatus.RU,
       })
       .getMany();
-    console.log("hotel with room is: ", hotelWithRooms);
 
     return res.send(
       hotelWithRooms
@@ -148,10 +146,16 @@ hotelController.patch("/:id", async (req, res) => {
     const id = req.params?.id as string;
     const name = req.body.name as string;
     const address = req.body.address as string;
+    const locationId = req.body.locationId as string;
 
     const Hotel = await getHotelById(id);
     if (name) Hotel.name = name;
     if (address) Hotel.address = address;
+    if (locationId) {
+      const location = await getLocationById(locationId);
+      Hotel.location = location;
+    } 
+    console.log("hotel is: ",Hotel);
     // hotelRepo.update({
     //   id
     // }, {
